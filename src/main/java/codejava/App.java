@@ -5,7 +5,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.sql.DriverManager;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Vector;
 
 /**
  * Hello world!
@@ -22,12 +27,177 @@ public class App
 
 	private static String keyStr, valueStr;
 	private static PreparedStatement statement = null;
+
+    private static HashMap<String, String> map = new HashMap<String, String>();
+	
+	private static ArrayList<String> keyArr = new ArrayList<String>();
+	private static ArrayList<String> valueArr = new ArrayList<String>();
+	
+	private static Vector<String> keyVec = new Vector<String>();
+	private static Vector<String> valueVec = new Vector<String>();
+	
+	private static List<String> keyRedisList = new ArrayList<String>();
+	private static List<String> keyHashMapList = new ArrayList<String>();
+    
     public static void main( String[] args )
     {
-        mysqlFnInsert();
-		mysqlFnFetch();
-        mysqlFnDelete();
+        // mysqlFnInsert();
+		// mysqlFnFetch();
+        // mysqlFnDelete();
+
+        /*---------------HashMap-----------------*/
+		// hashMapInsert();
+		// hashMapFetch();
+		// hashMapDelete();
+
+        /*--------------ArrayList-----------*/
+		// arrayListInsert();
+		// arrayListFetch();
+		// arrayListDelete();
+
+        /*--------------vector-----------*/
+		vectorInsert();
+        vectorFetch();
+        vectorDelete();
     }
+
+    public static long vectorDelete() {
+		startTime = System.currentTimeMillis();
+		for(int i = size - 1; i >= 0; i--) {
+			keyVec.remove(i);
+			valueVec.remove(i);
+		}
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		
+		System.out.println("Time To delete from a Vector: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+	
+	public static long vectorFetch() {
+		startTime = System.currentTimeMillis();
+		for(int i = 0; i < size; i++) {
+			System.out.println(keyVec.get(i) + " -> " + valueVec.get(i));
+			
+			if(i == 100)
+				break;
+		}
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		
+		System.out.println("Time To fetch from a Vector: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+	
+	public static long vectorInsert() {
+		startTime = System.currentTimeMillis();
+		for(int i = 0; i < size; i++) {
+			keyStr = getRandomString();
+			keyVec.addElement(keyStr);
+			valueVec.addElement(getMd5(keyStr));
+		}
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		
+		System.out.println("Time To insert into an Vector: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+
+    public static long arrayListDelete() {//check this fn later on
+		startTime = System.currentTimeMillis();
+		
+		for(int i = size-1; i >= 0; i--) {
+			
+				keyArr.remove(i);
+				valueArr.remove(i);
+		}
+		
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		
+		System.out.println("Time To delete from an ArrayList: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+	
+	public static long arrayListFetch() {
+		startTime = System.currentTimeMillis();
+		
+		for(int i = 0; i < size; i++) {
+			System.out.println(keyArr.get(i) + " -> " + valueArr.get(i));
+			
+			if(i == 100)
+				break;
+		}
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		
+		System.out.println("Time To fetch from an ArrayList: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+	
+	public static long arrayListInsert() {
+		
+		startTime = System.currentTimeMillis();
+		
+		for(int i = 0; i < size; i++) {
+			keyStr = getRandomString();
+			keyArr.add(keyStr);
+			valueArr.add(getMd5(keyStr));
+		}
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		
+		System.out.println("Time To insert into an ArrayList: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+
+    public static long hashMapInsert() {
+		startTime = System.currentTimeMillis();
+		
+		for(int i = 0; i < size; i++) {
+			keyStr = getRandomString();
+			valueStr = getMd5(keyStr);
+			map.put(keyStr, valueStr);
+			keyHashMapList.add(i, keyStr);
+		}
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		
+		System.out.println("Time To insert into a HashMap: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+	
+	public static long hashMapFetch() {
+		startTime = System.currentTimeMillis();
+		int inc = 0;
+		for(Map.Entry<String, String> set : map.entrySet()) {
+			System.out.println(set.getKey() + " -> " + set.getValue());
+			inc++;
+			
+			if(inc == 100)
+				break;
+		}
+		
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		System.out.println("Time To fetch from a HashMap: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+	
+	public static long hashMapDelete() {
+		startTime = System.currentTimeMillis();
+		int inc = 0;
+		
+		for(int i = size - 1; i > 0; i--) {
+			String v = keyHashMapList.get(i);
+			map.remove(v);
+		}
+		
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		System.out.println("Time To delete from a HashMap: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
 
     public static long mysqlFnInsert() {
         int rows = 0;
