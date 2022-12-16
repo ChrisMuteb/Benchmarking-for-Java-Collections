@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Vector;
 
+import redis.clients.jedis.Jedis;
+
 /**
  * Hello world!
  *
@@ -38,6 +40,8 @@ public class App
 	
 	private static List<String> keyRedisList = new ArrayList<String>();
 	private static List<String> keyHashMapList = new ArrayList<String>();
+
+    private static Jedis jedis = new Jedis("redis://default:redispw@localhost:49153");
     
     public static void main( String[] args )
     {
@@ -56,10 +60,76 @@ public class App
 		// arrayListDelete();
 
         /*--------------vector-----------*/
-		vectorInsert();
-        vectorFetch();
-        vectorDelete();
+		// vectorInsert();
+        // vectorFetch();
+        // vectorDelete();
+
+        /*--------------Redis-----------*/
+		redisInsert();
+        redisFetch();
+        redisDelete();
     }
+
+    public static long redisDelete() {
+		startTime = System.currentTimeMillis();
+		
+		// Jedis jedis = new Jedis("redis://default:redispw@localhost:49156");
+		jedis.auth("redispw");
+		System.out.println("Connected to Redis database");
+		
+		for(int i = 0; i < size; i++) {
+			String v = keyRedisList.get(i);
+			jedis.del(v);
+		}
+		
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		
+		System.out.println("Time To delete from the Redis: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+	
+	public static long redisFetch() {
+		startTime = System.currentTimeMillis();
+		
+		jedis.auth("redispw");
+		System.out.println("Connected to Redis database");
+		
+		for(int i = 0; i < 100; i++) {
+			String v = keyRedisList.get(i);
+			System.out.println(v + " -> " + jedis.get(v));
+		}
+		
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		// jedis.close();
+		System.out.println("Time To fetch from the Redis: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+	
+	public static long redisInsert() {
+		startTime = System.currentTimeMillis();
+		
+		// Jedis jedis = new Jedis("redis://default:redispw@localhost:49153");
+		jedis.auth("redispw");
+		System.out.println("Connected to Redis database");
+		
+		for(int i = 0; i < size; i++) {
+			keyStr = getRandomString();
+			valueStr = getMd5(keyStr);
+			
+			jedis.set(keyStr, valueStr);
+			keyRedisList.add(i, keyStr);
+		}
+		System.out.println("Last item in redis: " + keyStr);
+		
+		endTime = System.currentTimeMillis();
+		timeElapsed = endTime - startTime;
+		
+		System.out.println("Time To insert into the Redis: " + timeElapsed + "ms");
+		return timeElapsed;
+	}
+
 
     public static long vectorDelete() {
 		startTime = System.currentTimeMillis();
